@@ -82,7 +82,7 @@
                     <li class="right_li"><p><input name="" type="checkbox" checked value="" class="navi_check">&nbsp;本人同意中国平安后续致电联系确认赠险相关事宜
                     </p></li>
                 </ul>
-                <div class="right_but"><input type="button" value="免费领取"/></div>
+                <div class="right_but"><input type="button" id="submit" value="免费领取"/></div>
             </div>
         </div>
         <div class="navi_font">
@@ -106,5 +106,81 @@
 <script src="js/jsrender.js"></script>
 <script src="js/urlHandler.js"></script>
 <script src="js/common.js"></script>
+
+<script>
+    function  getArea(parentId,selector){
+
+        var url="http://localhost:8080/areas/"+parentId;
+        $.get(url,function (result) {
+            var html="<option value=\"\">请选择</option>";
+            $.each(result.data,function (index,value) {
+                html+="<option value=\""+value.id+"\">"+value.name+"</option>";
+
+            })
+            $(selector).html(html);
+        })
+        
+    }
+
+    $(function () {
+        getArea(0,"#tpl-area-province");
+        $("#tpl-area-province").change(function () {
+            if($("#tpl-area-province").val()==""){
+                $("#tpl-area-city").html("<option value=\"\">请选择</option>");
+                $("#tpl-area-town").html("<option value=\"\">请选择</option>");
+            }else{
+                getArea($("#tpl-area-province").val(),"#tpl-area-city");
+            }
+
+        })
+
+        $("#tpl-area-city").change(function () {
+            if($("#tpl-area-city").val()==""){
+                $("#tpl-area-town").html("<option value=\"\">请选择</option>");
+
+            }else{
+                getArea($("#tpl-area-city").val(),"#tpl-area-town");
+            }
+
+        })
+
+
+            })
+
+
+    $("#submit").click(function () {
+        var user={};
+        user.name=$(".four_name").val();
+        user.sex=$(".sex:checked").val();
+        user.birth=$(".four_birthday").val();
+        user.idNo=$(".four_idNo").val();
+        user.phone=$(".four_tel").val();
+        user.province=$("#tpl-area-province").val();
+        user.city=$("#tpl-area-city").val();
+        user.town=$("#tpl-area-town").val();
+        user.channelCode=UrlParm.parm("channelCode");
+        user.productCode="PA000000CXSF-PACXSZ-01";
+        console.log(JSON.stringify(user));
+        var url="http://localhost:8080/users/";
+
+        $.post(url,user,function (result) {
+            if(result.code==200){
+                alert("success");
+                $(".four_name").val("");
+                $(".four_birthday").val("");
+                $(".four_idNo").val("");
+                $(".four_tel").val("");
+            }else{
+                alert(result.message);
+            }
+        })
+
+    })
+    
+    
+</script>
+
+
+
 </html>
  
